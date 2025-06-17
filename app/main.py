@@ -25,7 +25,15 @@ async def crop_face(request: ImageRequest):
         if not face_locations:
             raise HTTPException(status_code=404, detail="No face found.")
 
+        padding = 100  # adjust as needed
+
         top, right, bottom, left = face_locations[0]
+
+        top = max(0, top - (padding+150))
+        right = min(image.shape[1], right + padding)
+        bottom = min(image.shape[0], bottom + padding-80)
+        left = max(0, left - padding)
+
         face_image = image[top:bottom, left:right]
 
         # Encode cropped face to JPEG
