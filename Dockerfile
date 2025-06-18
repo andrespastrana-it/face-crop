@@ -2,8 +2,8 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies for dlib, OpenCV, face_recognition
+RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
   libboost-all-dev \
@@ -11,17 +11,21 @@ RUN apt-get update && apt-get install -y \
   liblapack-dev \
   libx11-dev \
   libgtk-3-dev \
+  libdlib-dev \
+  ffmpeg \
+  libgl1-mesa-glx \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Upgrade pip and install Python dependencies
 COPY app/requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 # Copy source code
 COPY app .
 
-# Expose FastAPI port
+# Expose port 8000 for FastAPI
 EXPOSE 8000
 
-# Run the server
+# Start the FastAPI server
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
